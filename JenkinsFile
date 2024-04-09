@@ -1,0 +1,20 @@
+pipeline {
+        agent any
+stages {
+    stage('vault') {
+      environment {
+        VAULT_ADDR="http://host.docker.internal:8200"
+      }
+      steps {
+        withCredentials([string(credentialsId: 'id-token', variable: 'IDTOKEN')]) {
+            sh './vault write -field=token auth/jwt/login role=jenkins-folder-base jwt=${IDTOKEN} > token'
+            sh 'cat token'
+            sh 'echo ${IDTOKEN} | base64 > tmp'
+            sh 'cat tmp'
+            sh 'set +x ; VAULT_TOKEN=$(cat token) ./vault read -field=data -format=json kv/data/A00A50'
+            //sh 'set +x ; VAULT_TOKEN=$(cat token) ./vault token lookup'
+        }
+      }
+    }
+  }
+}
