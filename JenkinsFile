@@ -7,6 +7,9 @@ stages {
       }
       steps {
         withCredentials([string(credentialsId: 'id-token', variable: 'IDTOKEN')]) {
+            sh 'curl -O https://releases.hashicorp.com/vault/1.16.0/vault_1.16.0_linux_amd64.zip'
+            sh 'unzip -o vault_1.16.0_linux_amd64.zip'
+            sh 'chmod +x vault'
             sh './vault write -field=token auth/jwt/login role=jenkins-folder-base jwt=${IDTOKEN} > token'
             sh 'cat token'
             sh 'echo ${IDTOKEN} | base64 > tmp'
